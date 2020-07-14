@@ -1,0 +1,97 @@
+<html>
+    <head>
+        <title>خانه | رقبا</title>
+
+        <link rel= "stylesheet" type= "text/css"  href="{{ url_for('static',filename='styles/style.css') }}" >
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <style  type="text/css" media="screen">
+      
+         * {
+             font-family: Vazir;
+         }
+         .hide{
+             display:none;
+         }
+         nav li {
+             margin-left: 30px;
+             margin-right: 30px;
+         }
+        </style>
+    </head>
+    <body class="bg-light">
+        <div class="container">
+            <nav class="nav m-5 nav-pills" dir="rtl">
+                <div>
+                    <div class="input-group flex-nowrap">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-danger text-white" id="addon-wrapping">@</span>
+                        </div>
+                        <input type="text" id="livebox" class="form-control text-right" placeholder="نام کالا را وارد کنید" aria-label="Username" aria-describedby="addon-wrapping">
+                    </div>
+                </div>
+                <li class="nav-item">
+                    <a class="btn btn-outline-info" href="/rq">مشاهده وضعیت کرال</a>
+                </li>
+                <form method="POST" action="/">
+                    <button id="Update-btn" type="submit" class="btn btn-outline-primary">به روز رسانی اطلاعات</button>
+                </form>
+            </nav>
+            <div>
+            <center>
+                <h1>سلام</h1>
+            </center>
+            </div>
+            <h2 align="center">{% if message %}{{ message }}{% endif %}</h2>
+            <div class="text-center">
+                <div id="spinner" style="width:5rem; height: 5rem; margin-top:300px;" class="spinner-border text-dangrose hide mt-5" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <div id="datalist" class="row text-center" dir="rtl">
+            </div>
+    </body>
+    <script>
+     $(document).ready(function(){
+         $("#livebox").on("input",function(e){
+             $("#datalist").empty();
+             $("#spinner").removeClass("hide");
+             if($("#livebox").val() != '')
+             {
+                 $.ajax({
+                     method:"post",
+                     url:"/livesearch",
+                     data:{text:$("#livebox").val()},
+                     success:function(res){
+                         var data = ""
+                         $.each(res, function(index,value){
+                             data += "<div class=\"col-md-3 mb-2 mt-2 \"><div style='width:255;height:600;' class=\"card shadow-sm rounded \"><img style=\"width:auto; height:333;\" class=\"card-img-top\" src="+value['img']+" alt=\"Card image cap\">";
+                             data += "<div class=\"card-body\">"
+                             data += "<h5 class=\"card-title\">"+value['name']+"</h5>";
+                             if(value['specialprice'] != 0)
+                             {
+                                 data += "<p class=\"card-text\"> <del>"+value['price']+"</del></p>";
+                                 data += "<b class=\"card-text text-danger\"> "+value['specialprice']+" </b>";
+                             }
+                             else
+                             {
+                                 data += "<p class=\"card-text\">"+value['price']+"</p>";
+                             }
+                             data += "</div> <div class=\"card-footer text-muted\"><a href=/product/"+value['id']+" class=\"btn btn-block btn-primary\">جزئیات</a></div></div></div>"
+                         });
+                         $("#datalist").html(data);
+                     },
+                     complete: function () { // Set our complete callback, adding the .hidden class and hiding the spinner.
+                         $('#spinner').addClass('hide')
+                     },
+                 });
+             }
+             else
+             {
+                 $("#datalist").html('');
+                 $('#spinner').addClass('hide');
+             }
+         });
+     });
+    </script>
+</html>
