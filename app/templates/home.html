@@ -4,7 +4,11 @@
 
         <link rel= "stylesheet" type= "text/css"  href="{{ url_for('static',filename='styles/style.css') }}" >
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+        <script src="https://kit.fontawesome.com/cc91bc8190.js" crossorigin="anonymous"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
         <style  type="text/css" media="screen">
       
          * {
@@ -17,29 +21,40 @@
              margin-left: 30px;
              margin-right: 30px;
          }
+         footer {
+             position: fixed;
+             left: 0;
+             bottom: 0;
+             width: 100%;
+             color: white;
+             text-align: center;
+         }
         </style>
     </head>
     <body class="bg-light">
         <div class="container">
             <nav class="nav m-5 nav-pills" dir="rtl">
                 <div>
-                    <div class="input-group flex-nowrap">
+                    <div class="input-group flex-nowrap" dir="ltr">
                         <div class="input-group-prepend">
-                            <span class="input-group-text bg-danger text-white" id="addon-wrapping">@</span>
+                            <span class="input-group-text bg-danger text-white" id="addon-wrapping"><i class="fa fa-search"></i></span>
                         </div>
                         <input type="text" id="livebox" class="form-control text-right" placeholder="نام کالا را وارد کنید" aria-label="Username" aria-describedby="addon-wrapping">
                     </div>
                 </div>
                 <li class="nav-item">
-                    <a class="btn btn-outline-info" href="/rq">مشاهده وضعیت کرال</a>
-                </li>
+                    <a class="btn btn-outline-info" href="/rq">مشاهده وضعیت کرال <i class="fas fa-database"></i></a>
+                        </li>
                 <form method="POST" action="/">
-                    <button id="Update-btn" type="submit" class="btn btn-outline-primary">به روز رسانی اطلاعات</button>
+                    <button id="Update-btn" type="submit" class="btn btn-outline-primary"> بروز رسانی اطلاعات <i class="fas fa-spider"></i></button>
                 </form>
             </nav>
-            <div>
+            <div id="intro" dir="rtl" class="">
             <center>
                 <h1>سلام</h1>
+                <p>به نرم‌افزار تحت وب رقبا خوش آمدید.</p>
+                <p id="db">اگر برای بار اول است که از اپ استفاده می‌کنید، ابتدا از اتصال به
+                    دیتابیس <mark>mysql</mark> اطمینان حاصل کنید سپس بر روی دکمه بروز رسانی اطلاعات کلیک کنید.</p>
             </center>
             </div>
             <h2 align="center">{% if message %}{{ message }}{% endif %}</h2>
@@ -51,11 +66,27 @@
             <div id="datalist" class="row text-center" dir="rtl">
             </div>
     </body>
+    <footer class="bg-dark">
+        <div class="row">
+            <div class="col-md-6 offset-md-3" style="direction:rtl">
+                <small class="text-ligt text-right">هیچ حقوقی محفوظ نیست. محتوای سایت تحت مجوز <a class="text-info" href="https://github.com/mahdisafarian/Competitors/blob/master/LICENSE">GPL-3.0</a> منتشر می‌شود. </small>
+                <p><small> لطفا در استفاده از این کرالر انسان باشید و حجم ریکوئست‌های پایینی را ارسال کنید. </small></p>
+            </div>
+            <div class="col-md-3" style="direction:rtl">
+                <address>
+                    <small>
+                        <p>طراح: مهدی صفریان</p>
+                    </small>
+                </address>
+            </div>
+        </div>
+    </footer>
     <script>
      $(document).ready(function(){
          $("#livebox").on("input",function(e){
              $("#datalist").empty();
              $("#spinner").removeClass("hide");
+             $("#intro").addClass("hide")
              if($("#livebox").val() != '')
              {
                  $.ajax({
@@ -63,23 +94,31 @@
                      url:"/livesearch",
                      data:{text:$("#livebox").val()},
                      success:function(res){
-                         var data = ""
-                         $.each(res, function(index,value){
-                             data += "<div class=\"col-md-3 mb-2 mt-2 \"><div style='width:255;height:600;' class=\"card shadow-sm rounded \"><img style=\"width:auto; height:333;\" class=\"card-img-top\" src="+value['img']+" alt=\"Card image cap\">";
-                             data += "<div class=\"card-body\">"
-                             data += "<h5 class=\"card-title\">"+value['name']+"</h5>";
-                             if(value['specialprice'] != 0)
-                             {
-                                 data += "<p class=\"card-text\"> <del>"+value['price']+"</del></p>";
-                                 data += "<b class=\"card-text text-danger\"> "+value['specialprice']+" </b>";
-                             }
-                             else
-                             {
-                                 data += "<p class=\"card-text\">"+value['price']+"</p>";
-                             }
-                             data += "</div> <div class=\"card-footer text-muted\"><a href=/product/"+value['id']+" class=\"btn btn-block btn-primary\">جزئیات</a></div></div></div>"
-                         });
-                         $("#datalist").html(data);
+                         if(res != '')
+                         {
+                             var data = ""
+                             $.each(res, function(index,value){
+                                 data += "<div class=\"col-md-3 mb-2 mt-2 \"><div style='width:255;height:600;' class=\"card shadow-sm rounded \"><img style=\"width:auto; height:333;\" class=\"card-img-top\" src="+value['img']+" alt=\"Card image cap\">";
+                                 data += "<div class=\"card-body\">"
+                                 data += "<h5 class=\"card-title\">"+value['name']+"</h5>";
+                                 if(value['specialprice'] != 0)
+                                 {
+                                     data += "<p class=\"card-text\"> <del>"+value['price']+"</del></p>";
+                                     data += "<b class=\"card-text text-danger\"> "+value['specialprice']+" </b>";
+                                 }
+                                 else
+                                 {
+                                     data += "<p class=\"card-text\">"+value['price']+"</p>";
+                                 }
+                                 data += "</div> <div class=\"card-footer text-muted\"><a href=/product/"+value['id']+" class=\"btn btn-block btn-primary\">جزئیات</a></div></div></div>"
+                             });
+                             $("#datalist").html(data);
+                         }
+                         else
+                         {
+                             var data = "<h1>محصولی با این جزئیات یافت نشد.</h1>"
+                             $("#datalist").html(data);
+                         }
                      },
                      complete: function () { // Set our complete callback, adding the .hidden class and hiding the spinner.
                          $('#spinner').addClass('hide')
@@ -90,6 +129,8 @@
              {
                  $("#datalist").html('');
                  $('#spinner').addClass('hide');
+                 $('#db').addClass('hide');
+                 $("#intro").removeClass("hide")
              }
          });
      });
